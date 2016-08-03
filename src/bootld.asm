@@ -1,9 +1,10 @@
-;Initially coded with MikeOS tutorial - planning to rewrite and continue building up
 	BITS 16
 	s_version db 'aliOS v0.0.1',0
 	s_newline db 0Ah,0Dh,0
 	s_prompt db '$ ',0
-	
+
+	ptr_keybuffer db 0
+	times 8 db 0
 
 start:
 	mov ax, 07C0h	;Setting up a 4K stack space after bootloader
@@ -19,26 +20,42 @@ start:
 	
 	mov si, s_newline	
 	call print_string	
-		
 	mov si, s_prompt
 	call print_string
 
 .key:
 	call wait_key
+	;iterate through keybuffer until finding a zero
+	mov bx,ptr_keybuffer
+.find:
+	cmp byte [bx],0		
+	je .found		
+	inc bx
+	jmp .find	
+.found	
+	;replace the zero with the character, add a zero after
+	mov byte [bx], al 
+	inc bx
+	mov byte [bx], 0
+	
 	mov ah, 0Eh
-	int 10h
+	int 10h	
+	
+	;Check for Enter Key
 	cmp al,0Dh
 	jne .key			
+	mov si, s_newline	
+	call print_string	
+	
+	call echo_input  
+	mov [ptr_keybuffer],byte 0 ;reset keybuffer
 	
 	mov si, s_newline	
-	call print_string		
+	call print_string
 	mov si, s_prompt
 	call print_string
-	
+
 	jmp .key
-
-
-
 
 ;PRINT STRING METHOD
 print_string:
@@ -61,6 +78,14 @@ wait_key:
 	int 16h
 	ret
 
+;EVALUATE INPUT METHOD - TEMP
+echo_input:
+	;mov si, s_tempText
+	;call print_string
+	
+	mov si, ptr_keybuffer
+	call print_string
+	ret
 
 ;End of Code
 	times 510-($-$$) db 0	;Pads remainder of boot sector with 0s

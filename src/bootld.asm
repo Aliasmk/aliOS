@@ -4,7 +4,14 @@
 	s_prompt db '$ ',0
 
 	ptr_keybuffer db 0
-	times 8 db 0
+	times 32 db 0
+	
+	;string compare addresses
+	testString db 'ayy',0
+	lmaoString db 'lmao',0
+	firstAddress dw 1234h
+	secondAddress dw 1234h
+	sameWord db 0
 
 start:
 	mov ax, 07C0h	;Setting up a 4K stack space after bootloader
@@ -57,6 +64,9 @@ start:
 
 	jmp .key
 
+
+
+
 ;PRINT STRING METHOD
 print_string:
 	mov ah, 0Eh     ;BIOS procedure - Calling int 10h with 0Eh in AH means output to screen
@@ -72,20 +82,70 @@ print_string:
 	ret			;Returns from call location.
 
 
+
+
+
 ;WAIT FOR KEYBOARD METHOD
 wait_key:
 	mov ah, 0
 	int 16h
 	ret
 
-;EVALUATE INPUT METHOD - TEMP
+;ECHO INPUT METHOD - TEMP
 echo_input:
-	;mov si, s_tempText
-	;call print_string
-	
+	mov word [firstAddress],ptr_keybuffer
+	mov word [secondAddress],testString
+	call str_compare
+	cmp byte [sameWord],1
+	je .lmao
+	mov byte [sameWord],0
 	mov si, ptr_keybuffer
 	call print_string
 	ret
+	
+.lmao
+	mov si, lmaoString
+	call print_string
+	ret
+
+;COMPARES STRINGS STORED IN ADDRESSES POINTED TO BY THE TOP TWO ADDRESSES IN STACK, stores result in AL
+
+
+str_compare:
+
+.comparenext
+	;Loop through each character and compare them. Break if a character is not equal
+	mov bx,[firstAddress]
+	mov dl,[bx]
+	cmp dl,0
+	je .charend
+	
+	mov bx,[secondAddress]
+	mov dh,[bx]
+	cmp dh,0
+	je .charend
+	
+	cmp dl,dh
+	jne .differ ;End if one of the chars is different than the other
+	inc byte [firstAddress]
+	inc byte [secondAddress]
+	jmp .comparenext ;Loop back if they are equal
+
+.charend
+	;End positive if both characters are null as well
+	mov ax,dx
+	jnz .differ
+	;Strings are the same, return 1
+	mov byte [sameWord],1
+	ret
+		
+.differ
+	;Strings are different, return 0
+	;mov si, s_prompt
+	;call print_string
+	mov byte [sameWord],0
+	ret
+
 
 ;End of Code
 	times 510-($-$$) db 0	;Pads remainder of boot sector with 0s

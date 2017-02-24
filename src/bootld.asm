@@ -1,4 +1,23 @@
 	BITS 16
+	;FAT12 Header Begins
+	jmp start
+	nop
+	oem_name db 'aliOS0.1'
+	byte_per_sector dw 512
+	sector_per_cluster db 1
+	reserved_sectors dw 1
+	fat_copies db 2
+	root_dir_entry dw 224
+	total_sectors dw 2880
+	media_type db 0F0h
+	sectors_per_fat dw 9
+	sectors_per_trk dw 12
+	num_heads dw 2
+	hidden_sect dw 0
+	
+	
+	;FAT12 Header Ends
+
 	s_version db 'aliOS v0.0.1',0
 	s_newline db 0Ah,0Dh,0
 	s_prompt db '$ ',0

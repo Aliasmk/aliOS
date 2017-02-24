@@ -6,4 +6,6 @@ aliOS will take multiple forms throughout this project. Each version will ideall
 ## Current Status:
 Can boot img file in Virtual Box as a floppy. Displays "aliOS -- Hello World"
 
-More details soon. Need to finish exams first.
+Prompts for text, and when entered it will echo what you wrote. It can also can compare strings and if the user types 'ayy' it will echo 'lmao'.
+
+Will probably need to start over and write it most strictly as a bootloader rather than just a bootable x86 assembly program. Next steps include researching the implementation of FAT12.

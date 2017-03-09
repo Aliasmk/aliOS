@@ -8,4 +8,4 @@ Can boot img file in Virtual Box as a floppy. Displays "aliOS -- Hello World"
 
 Prompts for text, and when entered it will echo what you wrote. It can also can compare strings and if the user types 'ayy' it will echo 'lmao'.
 
-Will probably need to start over and write it most strictly as a bootloader rather than just a bootable x86 assembly program. Next steps include researching the implementation of FAT12.
+Migrated text related-code to a new main file, which is loaded and called from the bootloader. Now the main can be expanded further beyond 512 bytes if so desired.
